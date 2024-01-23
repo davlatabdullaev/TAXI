@@ -12,4 +12,5 @@ func New(h handler.Handler) {
 	http.HandleFunc("/driver", h.Driver)
 	http.HandleFunc("/car", h.Car)
 	http.HandleFunc("/trip", h.Trip)
+	http.HandleFunc("/trip_customer", h.TripCustomer)
 }

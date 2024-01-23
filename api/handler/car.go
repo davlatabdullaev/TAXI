@@ -152,11 +152,6 @@ func (h Handler) UpdateCarRoute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(updateCarRoute.CarID) == 0 {
-		handleResponse(w, http.StatusBadRequest, errors.New("id is required"))
-		return
-	}
-
 	if err := h.storage.Car().UpdateCarRoute(updateCarRoute); err != nil {
 		handleResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -172,16 +167,6 @@ func (h Handler) UpdateCarStatus(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&updateCarStatus); err != nil {
 		handleResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if len(updateCarStatus.ID) == 0 {
-		handleResponse(w, http.StatusBadRequest, errors.New("id is required"))
-		return
-	}
-
-	if updateCarStatus.ID == "" {
-		handleResponse(w, http.StatusBadRequest, errors.New("id cannot be empty"))
 		return
 	}
 

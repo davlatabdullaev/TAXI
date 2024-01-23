@@ -24,7 +24,8 @@ func (c *tripCustomerRepo) Create(req models.CreateTripCustomer) (string, error)
 	uid := uuid.New()
 
 	if _, err := c.db.Exec(`insert into 
-			trip_customers values ($1, $2, $3)
+			trip_customers 
+			(id, trip_id, customer_id) values($1, $2, $3)
 			`,
 		uid,
 		req.TripID,
@@ -41,108 +42,90 @@ func (c *tripCustomerRepo) Create(req models.CreateTripCustomer) (string, error)
 // TASK 7
 
 func (c *tripCustomerRepo) Get(id string) (models.TripCustomer, error) {
+	trip := models.TripCustomer{}
+	query := `SELECT tr.id, tr.trip_id, tr.customer_id, 
+       				 c.id as customer_id,c.full_name as customer_name, c.phone as customer_phone, 
+       				 c.email as customer_email, c.created_at as customer_date,
+       				 tr.created_at
+					FROM trip_customers as tr 
+					LEFT JOIN customers as c ON tr.customer_id = c.id WHERE tr.id = $1`
 
-	tripCustomer := models.TripCustomer{}
-
-	query := `
-		select id, trip_id, customer_id, customer_data, created_at from trip_customers where id = $1 
-`
 	if err := c.db.QueryRow(query, id).Scan(
-		&tripCustomer.ID,
-		&tripCustomer.TripID,
-		&tripCustomer.CustomerID,
-		&tripCustomer.CustomerData,
-		&tripCustomer.CreatedAt,
+		&trip.ID, &trip.TripID, &trip.CustomerID,
+		&trip.CustomerData.ID, &trip.CustomerData.FullName, &trip.CustomerData.Phone, &trip.CustomerData.Email,
+		&trip.CustomerData.CreatedAt, &trip.CreatedAt,
 	); err != nil {
-		fmt.Println("error while scanning trip customer", err.Error())
+		fmt.Println("error is while scanning trip customer", err.Error())
 		return models.TripCustomer{}, err
 	}
-
-	return models.TripCustomer{}, nil
-
+	return trip, nil
 }
 
 // TASK 8
 
 func (c *tripCustomerRepo) GetList(req models.GetListRequest) (models.TripCustomersResponse, error) {
 	var (
-		tripCustomers     = []models.TripCustomer{}
-		count             = 0
-		countQuery, query string
 		page              = req.Page
 		offset            = (page - 1) * req.Limit
+		tripCustomers     = []models.TripCustomer{}
+		query, countQuery string
+		count             = 0
 	)
 
-	countQuery = `
-		SELECT count(1) from trip_customers `
-
+	countQuery = `SELECT count(1) FROM trip_customers`
 	if err := c.db.QueryRow(countQuery).Scan(&count); err != nil {
-		fmt.Println("error while scanning count of users", err.Error())
+		fmt.Println("error is while scanning count", err.Error())
 		return models.TripCustomersResponse{}, err
 	}
 
-	query = `
-		SELECT id, trip_id, customer_id, customer_data, created_at
-			FROM trip_customers
-			    `
-
+	query = `SELECT tr.id, tr.trip_id, tr.customer_id, 
+       				 c.id as customer_id,c.full_name as customer_name, c.phone as customer_phone, 
+       				 c.email as customer_email, c.created_at as customer_date,
+       				 tr.created_at
+					FROM trip_customers as tr 
+					LEFT JOIN customers as c ON tr.customer_id = c.id `
 	query += ` LIMIT $1 OFFSET $2`
 
 	rows, err := c.db.Query(query, req.Limit, offset)
 	if err != nil {
-		fmt.Println("error while query rows", err.Error())
+		fmt.Println("error is while selecting trip customers", err.Error())
 		return models.TripCustomersResponse{}, err
 	}
 
 	for rows.Next() {
-		tripCustomer := models.TripCustomer{}
-
+		trip := models.TripCustomer{}
 		if err = rows.Scan(
-			&tripCustomer.ID,
-			&tripCustomer.TripID,
-			&tripCustomer.CustomerID,
-			&tripCustomer.CustomerData,
-			&tripCustomer.CreatedAt,
+			&trip.ID, &trip.TripID, &trip.CustomerID,
+			&trip.CustomerData.ID, &trip.CustomerData.FullName, &trip.CustomerData.Phone, &trip.CustomerData.Email,
+			&trip.CustomerData.CreatedAt, &trip.CreatedAt,
 		); err != nil {
-			fmt.Println("error while scanning row", err.Error())
+			fmt.Println("error is while scanning rows", err.Error())
 			return models.TripCustomersResponse{}, err
 		}
-
-		tripCustomers = append(tripCustomers, tripCustomer)
+		tripCustomers = append(tripCustomers, trip)
 	}
 
 	return models.TripCustomersResponse{
 		TripCustomers: tripCustomers,
 		Count:         count,
 	}, nil
-
 }
 
 func (c *tripCustomerRepo) Update(req models.TripCustomer) (string, error) {
-	query := `
-	update trip_customers 
-		set trip_id = $1, customer_id = $2, customer_data = $3
-			where id = $4`
-
-	if _, err := c.db.Exec(query, req.TripID, req.CustomerID, req.CustomerData, req.ID); err != nil {
-		fmt.Println("error while updating trip customer data", err.Error())
+	query := `UPDATE trip_customers SET customer_id = $1 WHERE id = $2`
+	if _, err := c.db.Exec(query, req.CustomerID, req.ID); err != nil {
+		fmt.Println("error is while updating trip customer", err.Error())
 		return "", err
 	}
 	return req.ID, nil
-
 }
 
 func (c *tripCustomerRepo) Delete(id string) error {
-	query := `
-	delete from trip_customers
-		where id = $1
-`
+	query := `DELETE FROM trip_customers WHERE id = $1`
+
 	if _, err := c.db.Exec(query, id); err != nil {
-
-		fmt.Println("error while deleting trip customer by id", err.Error())
-
+		fmt.Println("error is while deleting trip customer", err.Error())
 		return err
 	}
-
 	return nil
 }

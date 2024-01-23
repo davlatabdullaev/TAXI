@@ -32,10 +32,10 @@ type ICustomerRepo interface {
 
 type IDriverRepo interface {
 	Create(driver models.CreateDriver) (string, error)
-	Get(id string) (models.Driver, error)
+	Get(id models.PrimaryKey) (models.Driver, error)
 	GetList(req models.GetListRequest) (models.DriversResponse, error)
 	Update(driver models.Driver) (string, error)
-	Delete(id string) error
+	Delete(id models.PrimaryKey) error
 }
 
 type ICarRepo interface {
@@ -50,10 +50,10 @@ type ICarRepo interface {
 
 type ITripRepo interface {
 	Create(trip models.CreateTrip) (string, error)
-	Get(id string) (models.Trip, error)
+	Get(id models.PrimaryKey) (models.Trip, error)
 	GetList(req models.GetListRequest) (models.TripsResponse, error)
 	Update(trip models.Trip) (string, error)
-	Delete(id string) error
+	Delete(id models.PrimaryKey) error
 }
 
 type ITripCustomerRepo interface {
