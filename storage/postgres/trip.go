@@ -231,16 +231,14 @@ func (c tripRepo) GetList(req models.GetListRequest) (models.TripsResponse, erro
 func (c tripRepo) Update(req models.Trip) (string, error) {
 	query := `
         UPDATE trips 
-        SET trip_number_id = $1, 
-            from_city_id = $2, 
-            to_city_id = $3, 
-            driver_id = $4, 
-            price = $5, 
-            created_at = $6
-        WHERE id = $7
+        SET  from_city_id = $1, 
+            to_city_id = $2, 
+            driver_id = $3, 
+            price = $4 
+        WHERE id = $5
     `
 
-	_, err := c.db.Exec(query, req.TripNumberID, req.FromCityID, req.ToCityID, req.DriverID, req.Price, req.CreatedAt, req.ID)
+	_, err := c.db.Exec(query, req.FromCityID, req.ToCityID, req.DriverID, req.Price, req.ID)
 	if err != nil {
 		fmt.Println("error while updating trips data:", err.Error())
 		return " ", err

@@ -27,7 +27,7 @@ func main() {
 
 	api.New(handler)
 
-	fmt.Println("Server is running on port 8080")
+	fmt.Println("Server is running on port 8088")
 	if err = http.ListenAndServe(":8088", nil); err != nil {
 		log.Fatalln("error while running server err:", err.Error())
 	}

@@ -49,8 +49,6 @@ func (h Handler) CreateTripCustomer(w http.ResponseWriter, r *http.Request) {
 	handleResponse(w, http.StatusCreated, createdTrip)
 }
 
-// TASK 7
-
 func (h Handler) GetTripCustomerByID(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	if len(values["id"]) <= 0 {
@@ -67,8 +65,6 @@ func (h Handler) GetTripCustomerByID(w http.ResponseWriter, r *http.Request) {
 
 	handleResponse(w, http.StatusOK, tripCustomer)
 }
-
-// TASK 8
 
 func (h Handler) GetTripCustomerList(w http.ResponseWriter, r *http.Request) {
 	var (

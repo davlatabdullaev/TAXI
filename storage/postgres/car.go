@@ -167,3 +167,15 @@ func (c carRepo) Delete(id string) error {
 	return nil
 
 }
+
+
+func (c carRepo) UpdateCarStatus(updateCarStatus models.UpdateCarStatus) error {
+	query := `update cars set status = $1 where id = $2`
+
+	if _, err := c.db.Exec(query, updateCarStatus.Status, updateCarStatus.ID); err != nil {
+		fmt.Println("error while updating car status ", err.Error())
+		return err
+	}
+
+	return nil
+}

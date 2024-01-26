@@ -50,7 +50,6 @@ create table trip_customers (
 
 
 
---  TASK  11
 
 
 CREATE SEQUENCE trip_num_id_sequence START 1;

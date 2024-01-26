@@ -132,3 +132,24 @@ func (h Handler) DeleteCar(w http.ResponseWriter, r *http.Request) {
 	handleResponse(w, http.StatusOK, "data succesfully deleted")
 
 }
+
+func (h Handler) UpdateCarStatus(w http.ResponseWriter, r *http.Request) {
+	updateCarStatus := models.UpdateCarStatus{}
+
+	if err := json.NewDecoder(r.Body).Decode(&updateCarStatus); err != nil {
+		handleResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if len(updateCarStatus.ID) == 0 {
+		handleResponse(w, http.StatusBadRequest, errors.New("id is required"))
+		return
+	}
+
+	if err := h.storage.Car().UpdateCarStatus(updateCarStatus); err != nil {
+		handleResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	handleResponse(w, http.StatusOK, "car status updated successfully")
+}

@@ -5,7 +5,6 @@ import (
 	"city2city/storage"
 	"database/sql"
 	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -19,27 +18,17 @@ func NewTripCustomerRepo(db *sql.DB) storage.ITripCustomerRepo {
 	}
 }
 
-func (c tripCustomerRepo) Create(req models.CreateTripCustomer) (string, error) {
-
-	uid := uuid.New()
-
-	if _, err := c.db.Exec(`insert into 
-			trip_customers 
-			(id, trip_id, customer_id) values($1, $2, $3)
-			`,
-		uid,
-		req.TripID,
-		req.CustomerID,
-	); err != nil {
-		fmt.Println("error while inserting data", err.Error())
+func (c *tripCustomerRepo) Create(req models.CreateTripCustomer) (string, error) {
+	id := uuid.New()
+	query := `INSERT INTO trip_customers (id, trip_id, customer_id) values($1, $2, $3)`
+	if _, err := c.db.Exec(query, id, req.TripID, req.CustomerID); err != nil {
+		fmt.Println("error is while inserting trip customer", err.Error())
 		return "", err
 	}
-
-	return uid.String(), nil
-
+	return id.String(), nil
 }
 
-func (c tripCustomerRepo) Get(id string) (models.TripCustomer, error) {
+func (c *tripCustomerRepo) Get(id string) (models.TripCustomer, error) {
 	trip := models.TripCustomer{}
 	query := `SELECT tr.id, tr.trip_id, tr.customer_id, 
        				 c.id as customer_id,c.full_name as customer_name, c.phone as customer_phone, 
@@ -49,15 +38,9 @@ func (c tripCustomerRepo) Get(id string) (models.TripCustomer, error) {
 					LEFT JOIN customers as c ON tr.customer_id = c.id WHERE tr.id = $1`
 
 	if err := c.db.QueryRow(query, id).Scan(
-		&trip.ID,
-		&trip.TripID,
-		&trip.CustomerID,
-		&trip.CustomerData.ID,
-		&trip.CustomerData.FullName,
-		&trip.CustomerData.Phone,
-		&trip.CustomerData.Email,
-		&trip.CustomerData.CreatedAt,
-		&trip.CreatedAt,
+		&trip.ID, &trip.TripID, &trip.CustomerID,
+		&trip.CustomerData.ID, &trip.CustomerData.FullName, &trip.CustomerData.Phone, &trip.CustomerData.Email,
+		&trip.CustomerData.CreatedAt, &trip.CreatedAt,
 	); err != nil {
 		fmt.Println("error is while scanning trip customer", err.Error())
 		return models.TripCustomer{}, err
@@ -65,7 +48,7 @@ func (c tripCustomerRepo) Get(id string) (models.TripCustomer, error) {
 	return trip, nil
 }
 
-func (c tripCustomerRepo) GetList(req models.GetListRequest) (models.TripCustomersResponse, error) {
+func (c *tripCustomerRepo) GetList(req models.GetListRequest) (models.TripCustomersResponse, error) {
 	var (
 		page              = req.Page
 		offset            = (page - 1) * req.Limit
@@ -113,7 +96,7 @@ func (c tripCustomerRepo) GetList(req models.GetListRequest) (models.TripCustome
 	}, nil
 }
 
-func (c tripCustomerRepo) Update(req models.TripCustomer) (string, error) {
+func (c *tripCustomerRepo) Update(req models.TripCustomer) (string, error) {
 	query := `UPDATE trip_customers SET customer_id = $1 WHERE id = $2`
 	if _, err := c.db.Exec(query, req.CustomerID, req.ID); err != nil {
 		fmt.Println("error is while updating trip customer", err.Error())

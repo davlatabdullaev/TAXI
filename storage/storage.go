@@ -44,6 +44,7 @@ type ICarRepo interface {
 	GetList(req models.GetListRequest) (models.CarsResponse, error)
 	Update(car models.Car) (string, error)
 	Delete(id string) error
+	UpdateCarStatus(models.UpdateCarStatus) error
 	}
 
 type ITripRepo interface {
