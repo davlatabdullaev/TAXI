@@ -19,7 +19,7 @@ func NewTripRepo(db *sql.DB) storage.ITripRepo {
 		db: db,
 	}
 }
-func (t *tripRepo) Create(req models.CreateTrip) (string, error) {
+func (t tripRepo) Create(req models.CreateTrip) (string, error) {
 	uid := uuid.New()
 	createdAt := time.Now()
 
@@ -50,9 +50,7 @@ func (t *tripRepo) Create(req models.CreateTrip) (string, error) {
 	return uid.String(), nil
 }
 
-// TASK 9
-
-func (c *tripRepo) Get(id models.PrimaryKey) (models.Trip, error) {
+func (c tripRepo) Get(id models.PrimaryKey) (models.Trip, error) {
 	trip := models.Trip{}
 
 	query := `
@@ -127,9 +125,7 @@ func (c *tripRepo) Get(id models.PrimaryKey) (models.Trip, error) {
 	return trip, nil
 }
 
-// TASK 10
-
-func (c *tripRepo) GetList(req models.GetListRequest) (models.TripsResponse, error) {
+func (c tripRepo) GetList(req models.GetListRequest) (models.TripsResponse, error) {
 	var (
 		trips  = []models.Trip{}
 		count  = 0

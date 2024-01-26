@@ -19,12 +19,7 @@ func (h Handler) Car(w http.ResponseWriter, r *http.Request) {
 			h.GetCarByID(w, r)
 		}
 	case http.MethodPut:
-		values := r.URL.Query()
-		if _, ok := values["route"]; ok {
-			h.UpdateCarRoute(w, r)
-		} else if _, ok := values["status"]; ok {
-			h.UpdateCarStatus(w, r)
-		} else {
+		{
 			h.UpdateCar(w, r)
 		}
 	case http.MethodDelete:
@@ -56,8 +51,6 @@ func (h Handler) CreateCar(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// TASK 3
-
 func (h Handler) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	if len(values["id"]) <= 0 {
@@ -76,8 +69,6 @@ func (h Handler) GetCarByID(w http.ResponseWriter, r *http.Request) {
 	handleResponse(w, http.StatusOK, car)
 
 }
-
-// TASK 4
 
 func (h Handler) GetCarList(w http.ResponseWriter) {
 
@@ -140,40 +131,4 @@ func (h Handler) DeleteCar(w http.ResponseWriter, r *http.Request) {
 
 	handleResponse(w, http.StatusOK, "data succesfully deleted")
 
-}
-
-// TASK 1
-
-func (h Handler) UpdateCarRoute(w http.ResponseWriter, r *http.Request) {
-	updateCarRoute := models.UpdateCarRoute{}
-
-	if err := json.NewDecoder(r.Body).Decode(&updateCarRoute); err != nil {
-		handleResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if err := h.storage.Car().UpdateCarRoute(updateCarRoute); err != nil {
-		handleResponse(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	handleResponse(w, http.StatusOK, "Car route successfully updated")
-}
-
-// TASK 2
-
-func (h Handler) UpdateCarStatus(w http.ResponseWriter, r *http.Request) {
-	updateCarStatus := models.UpdateCarStatus{}
-
-	if err := json.NewDecoder(r.Body).Decode(&updateCarStatus); err != nil {
-		handleResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if err := h.storage.Car().UpdateCarStatus(updateCarStatus); err != nil {
-		handleResponse(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	handleResponse(w, http.StatusOK, "car status updated successfully")
 }

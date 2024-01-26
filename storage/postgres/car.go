@@ -5,7 +5,6 @@ import (
 	"city2city/storage"
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -33,8 +32,6 @@ func (c carRepo) Create(car models.CreateCar) (string, error) {
 	return uid, nil
 
 }
-
-// TASK 3
 
 func (c carRepo) Get(id string) (models.Car, error) {
 	car := models.Car{}
@@ -76,8 +73,6 @@ func (c carRepo) Get(id string) (models.Car, error) {
 
 	return car, nil
 }
-
-// TASK 4
 
 func (c carRepo) GetList(req models.GetListRequest) (models.CarsResponse, error) {
 	query := `
@@ -170,42 +165,5 @@ func (c carRepo) Delete(id string) error {
 		return err
 	}
 	return nil
-
-}
-
-// TASK 1
-
-func (c carRepo) UpdateCarRoute(updateCarRoute models.UpdateCarRoute) error {
-
-	s, err := c.db.Prepare("UPDATE cars SET departure_time=$1, from_city_id=$2, to_city_id=$3 WHERE car_id=$4")
-	if err != nil {
-		return err
-	}
-	defer s.Close()
-	updateCarRoute.DepartureTime = time.Now()
-	_, err = s.Exec(updateCarRoute.DepartureTime, updateCarRoute.FromCityID, updateCarRoute.ToCityID, updateCarRoute.CarID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
-// TASK 2
-
-func (c carRepo) UpdateCarStatus(updateCarStatus models.UpdateCarStatus) error {
-
-	s, err := c.db.Prepare("UPDATE cars SET status=$1 WHERE id=$2")
-	if err != nil {
-		return err
-	}
-	defer s.Close()
-
-	_, err = s.Exec(updateCarStatus.Status, updateCarStatus.ID)
-	if err != nil {
-		return err
-	}
-	return nil	
 
 }
